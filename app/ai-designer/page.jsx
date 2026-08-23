@@ -15,36 +15,28 @@ const gradients = [
   'from-blue-400 via-cyan-400 to-teal-400',
   'from-green-400 via-lime-400 to-yellow-400',
   'from-orange-400 via-amber-400 to-yellow-400',
-  'from-indigo-400 via-purple-400 to-pink-400',
-  'from-rose-400 via-fuchsia-400 to-indigo-400',
 ]
-
-const emojis = ['🎨', '✨', '🌟', '']
 
 export default function AIDesignerPage() {
   const [prompt, setPrompt] = useState('')
-  const [loading, setLoading] = useState(false)
   const [designs, setDesigns] = useState(null)
   const [selected, setSelected] = useState(null)
   const [added, setAdded] = useState(false)
+  const [loadingImgs, setLoadingImgs] = useState(0)
 
   const generate = () => {
     if (!prompt.trim()) return
-    setLoading(true)
-    setDesigns(null)
+    const base = encodeURIComponent(prompt + ', high quality print design')
+    setDesigns(
+      [0, 1, 2, 3].map((i) => ({
+        id: i,
+        gradient: gradients[i],
+        url: 'https://image.pollinations.ai/prompt/' + base + '?seed=' + (Date.now() % 100000 + i) + '&width=512&height=512&nologo=true',
+      }))
+    )
+    setLoadingImgs(4)
     setSelected(null)
     setAdded(false)
-    setTimeout(() => {
-      const seed = prompt.length
-      setDesigns(
-        [0, 1, 2, 3].map((i) => ({
-          id: i,
-          gradient: gradients[(seed + i) % gradients.length],
-          emoji: emojis[i],
-        }))
-      )
-      setLoading(false)
-    }, 2000)
   }
 
   return (
@@ -81,33 +73,35 @@ export default function AIDesignerPage() {
           </div>
           <button
             onClick={generate}
-            disabled={loading || !prompt.trim()}
+            disabled={!prompt.trim()}
             className="w-full bg-purple-600 text-white py-4 rounded-xl text-lg font-semibold hover:bg-purple-700 disabled:bg-gray-300"
           >
-            {loading ? 'AI is creating your designs...' : 'Generate Designs'}
+            Generate Designs
           </button>
         </div>
 
-        {loading && (
-          <div className="text-center py-12">
-            <div className="text-6xl animate-bounce mb-4">🎨</div>
-            <p className="text-gray-600">AI is painting your idea...</p>
-          </div>
-        )}
-
         {designs && (
           <div>
-            <h2 className="text-2xl font-bold mb-4 text-center">Your AI Designs</h2>
+            <h2 className="text-2xl font-bold mb-2 text-center">Your AI Designs</h2>
+            <p className="text-center text-sm text-gray-500 mb-6">
+              {loadingImgs > 0 ? 'AI is drawing... wait up to 30 seconds' : 'Tap a design to select it'}
+            </p>
             <div className="grid grid-cols-2 gap-4 mb-8">
               {designs.map((d) => (
                 <button
                   key={d.id}
                   onClick={() => { setSelected(d.id); setAdded(false) }}
-                  className={`bg-gradient-to-br ${d.gradient} aspect-square rounded-2xl flex items-center justify-center text-6xl transition ${
+                  className={`bg-gradient-to-br ${d.gradient} aspect-square rounded-2xl overflow-hidden relative transition ${
                     selected === d.id ? 'ring-4 ring-purple-600 scale-95' : 'hover:scale-105'
                   }`}
                 >
-                  {d.emoji}
+                  <img
+                    src={d.url}
+                    alt="AI design"
+                    onLoad={() => setLoadingImgs((n) => n - 1)}
+                    onError={() => setLoadingImgs((n) => n - 1)}
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
