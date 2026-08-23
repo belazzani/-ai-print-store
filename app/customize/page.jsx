@@ -1,15 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 
 const products = [
-  { id: 'tshirt', name: 'Classic T-Shirt', price: 24.99, type: 'tee', sizes: true },
-  { id: 'hoodie', name: 'Hoodie', price: 44.99, type: 'hoodie', sizes: true },
-  { id: 'mug', name: 'Ceramic Mug', price: 14.99, type: 'mug', sizes: false },
-  { id: 'phone', name: 'Mobile Cover', price: 19.99, type: 'phone', sizes: false },
-  { id: 'poster', name: 'Poster', price: 12.99, type: 'poster', sizes: false },
-  { id: 'tote', name: 'Tote Bag', price: 19.99, type: 'tote', sizes: true },
+  { id: 'tshirt', name: 'T-Shirt', price: 24.99, type: 'tee', apparel: true },
+  { id: 'hoodie', name: 'Hoodie', price: 44.99, type: 'hoodie', apparel: true },
+  { id: 'mug', name: 'Mug', price: 14.99, type: 'mug', apparel: false },
+  { id: 'phone', name: 'Mobile Cover', price: 19.99, type: 'phone', apparel: false },
+  { id: 'poster', name: 'Poster', price: 12.99, type: 'poster', apparel: false },
 ]
 
 const colors = [
@@ -19,91 +18,122 @@ const colors = [
   { name: 'Blue', hex: '#2563eb' },
   { name: 'Green', hex: '#16a34a' },
   { name: 'Yellow', hex: '#facc15' },
-  { name: 'Purple', hex: '#9333ea' },
-  { name: 'Pink', hex: '#ec4899' },
 ]
 
 const sizes = ['S', 'M', 'L', 'XL', '2XL']
+const fonts = ['Arial', 'Georgia', 'Impact', 'Courier New', 'Comic Sans MS']
 
-const printAreas = {
-  tee: { x: 105, y: 105, w: 90, h: 110 },
-  hoodie: { x: 105, y: 125, w: 90, h: 95 },
-  mug: { x: 95, y: 110, w: 110, h: 100 },
-  phone: { x: 110, y: 80, w: 80, h: 150 },
-  poster: { x: 60, y: 50, w: 180, h: 200 },
-  tote: { x: 100, y: 110, w: 100, h: 110 },
+const areas = {
+  'tee-front': { l: 35, t: 35, w: 30, h: 37 },
+  'tee-back': { l: 35, t: 33, w: 30, h: 40 },
+  'hoodie-front': { l: 35, t: 42, w: 30, h: 30 },
+  'hoodie-back': { l: 35, t: 40, w: 30, h: 33 },
+  'mug': { l: 32, t: 37, w: 37, h: 33 },
+  'phone': { l: 37, t: 27, w: 27, h: 50 },
+  'poster': { l: 20, t: 17, w: 60, h: 66 },
 }
 
-function ProductBase({ type, color }) {
-  const stroke = '#00000030'
-  if (type === 'tee') return <path d="M95 45 L65 58 L28 92 L52 120 L75 102 L75 275 L225 275 L225 102 L248 120 L272 92 L235 58 L205 45 C205 45 192 62 150 62 C108 62 95 45 95 45 Z" fill={color} stroke={stroke} strokeWidth="2" />
-  if (type === 'hoodie') return (
-    <g>
-      <path d="M95 50 L65 62 L28 96 L52 124 L75 106 L75 275 L225 275 L225 106 L248 124 L272 96 L235 62 L205 50 C205 50 192 66 150 66 C108 66 95 50 95 50 Z" fill={color} stroke={stroke} strokeWidth="2" />
-      <path d="M110 50 C110 25 190 25 190 50 C190 62 170 70 150 70 C130 70 110 62 110 50 Z" fill={color} stroke={stroke} strokeWidth="2" />
-      <rect x="115" y="225" width="70" height="40" rx="8" fill="#00000015" />
-    </g>
-  )
+const emptyLayer = { url: null, x: 20, y: 15, w: 60, text: '', textSize: 16, textColor: '#ffffff', font: 'Arial', tx: 25, ty: 80 }
+
+function Mock({ type, back, color }) {
+  const s = '#00000030'
+  if (type === 'tee' || type === 'hoodie') {
+    return (
+      <svg viewBox="0 0 300 300" className="absolute inset-0 w-full h-full">
+        <path d="M95 45 L65 58 L28 92 L52 120 L75 102 L75 275 L225 275 L225 102 L248 120 L272 92 L235 58 L205 45 C205 45 192 62 150 62 C108 62 95 45 95 45 Z" fill={color} stroke={s} strokeWidth="2" />
+        {type === 'hoodie' && <path d="M110 48 C110 22 190 22 190 48 C190 60 170 68 150 68 C130 68 110 60 110 48 Z" fill={color} stroke={s} strokeWidth="2" />}
+        {!back && type === 'tee' && <path d="M125 45 C125 58 175 58 175 45" fill="none" stroke={s} strokeWidth="3" />}
+        {type === 'hoodie' && <rect x="115" y="225" width="70" height="40" rx="8" fill="#00000015" />}
+      </svg>
+    )
+  }
   if (type === 'mug') return (
-    <g>
+    <svg viewBox="0 0 300 300" className="absolute inset-0 w-full h-full">
       <path d="M215 120 C258 120 258 200 215 200" fill="none" stroke={color} strokeWidth="16" />
-      <rect x="80" y="90" width="140" height="150" rx="14" fill={color} stroke={stroke} strokeWidth="2" />
+      <rect x="80" y="90" width="140" height="150" rx="14" fill={color} stroke={s} strokeWidth="2" />
       <ellipse cx="150" cy="90" rx="70" ry="12" fill="#00000020" />
-    </g>
+    </svg>
   )
   if (type === 'phone') return (
-    <g>
-      <rect x="100" y="40" width="100" height="210" rx="20" fill={color} stroke={stroke} strokeWidth="2" />
+    <svg viewBox="0 0 300 300" className="absolute inset-0 w-full h-full">
+      <rect x="100" y="40" width="100" height="210" rx="20" fill={color} stroke={s} strokeWidth="2" />
       <circle cx="150" cy="62" r="7" fill="#00000035" />
-    </g>
+    </svg>
   )
-  if (type === 'poster') return <rect x="50" y="40" width="200" height="220" fill={color} stroke={stroke} strokeWidth="2" />
   return (
-    <g>
-      <path d="M115 95 C115 60 185 60 185 95" fill="none" stroke={color} strokeWidth="10" />
-      <rect x="90" y="95" width="120" height="140" rx="10" fill={color} stroke={stroke} strokeWidth="2" />
-    </g>
+    <svg viewBox="0 0 300 300" className="absolute inset-0 w-full h-full">
+      <rect x="50" y="40" width="200" height="220" fill={color} stroke={s} strokeWidth="2" />
+    </svg>
   )
 }
 
 export default function CustomizePage() {
   const [productId, setProductId] = useState('tshirt')
-  const [colorHex, setColorHex] = useState('#ffffff')
+  const [colorHex, setColorHex] = useState('#1f2937')
   const [size, setSize] = useState('M')
-  const [scale, setScale] = useState(0.7)
-  const [posX, setPosX] = useState(0)
-  const [posY, setPosY] = useState(0)
-  const [text, setText] = useState('')
-  const [textColor, setTextColor] = useState('#1f2937')
-  const [textSize, setTextSize] = useState(14)
-  const [designUrl, setDesignUrl] = useState(null)
+  const [back, setBack] = useState(false)
+  const [layers, setLayers] = useState({})
+  const [selected, setSelected] = useState('design')
   const [added, setAdded] = useState(false)
+
+  const printRef = useRef(null)
+  const drag = useRef(null)
 
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('aiprint_design') || 'null')
-      if (saved && saved.designUrl) setDesignUrl(saved.designUrl)
+      if (saved && saved.designUrl) {
+        setLayers((prev) => ({ ...prev, 'tee-front': { ...(prev['tee-front'] || emptyLayer), url: saved.designUrl } }))
+      }
     } catch (e) {}
   }, [])
 
   const product = products.find((p) => p.id === productId)
-  const pa = printAreas[product.type]
-  const dw = pa.w * scale
-  const dx = pa.x + pa.w / 2 - dw / 2 + (posX / 100) * pa.w
-  const dy = pa.y + pa.h / 2 - dw / 2 + (posY / 100) * pa.h
+  const areaKey = product.apparel ? product.type + (back ? '-back' : '-front') : product.type
+  const area = areas[areaKey] || areas['poster']
+  const layer = layers[areaKey] || emptyLayer
+
+  const setLayer = (patch) => setLayers((prev) => ({ ...prev, [areaKey]: { ...(prev[areaKey] || emptyLayer), ...patch } }))
+
+  const startDrag = (e, kind) => {
+    e.stopPropagation()
+    try { e.currentTarget.setPointerCapture(e.pointerId) } catch (err) {}
+    const rect = printRef.current.getBoundingClientRect()
+    drag.current = { kind, sx: e.clientX, sy: e.clientY, ox: kind === 'design' ? layer.x : layer.tx, oy: kind === 'design' ? layer.y : layer.ty, rect }
+    setSelected(kind)
+  }
+
+  const startResize = (e) => {
+    e.stopPropagation()
+    try { e.currentTarget.setPointerCapture(e.pointerId) } catch (err) {}
+    const rect = printRef.current.getBoundingClientRect()
+    drag.current = { kind: 'resize', sx: e.clientX, ow: layer.w, rect }
+  }
+
+  const onMove = (e) => {
+    const d = drag.current
+    if (!d) return
+    const dx = ((e.clientX - d.sx) / d.rect.width) * 100
+    const dy = ((e.clientY - d.sy) / d.rect.height) * 100
+    if (d.kind === 'design') setLayer({ x: d.ox + dx, y: d.oy + dy })
+    else if (d.kind === 'text') setLayer({ tx: d.ox + dx, ty: d.oy + dy })
+    else setLayer({ w: Math.min(100, Math.max(10, d.ow + dx * 1.5)) })
+  }
+
+  const endDrag = () => { drag.current = null }
 
   const onUpload = (e) => {
     const file = e.target.files[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = () => setDesignUrl(reader.result)
+    reader.onload = () => setLayer({ url: reader.result })
     reader.readAsDataURL(file)
   }
 
   const addToCart = () => {
     let cart = []
     try { cart = JSON.parse(localStorage.getItem('aiprint_cart') || '[]') } catch (e) {}
-    cart.push({ id: product.id, name: product.name, price: product.price, color: colors.find((c) => c.hex === colorHex).name, size: product.sizes ? size : 'One size', designUrl: designUrl, text: text })
+    cart.push({ id: product.id, name: product.name, price: product.price, color: colors.find((c) => c.hex === colorHex).name, size: product.apparel ? size : 'One size', designUrl: layer.url, text: layer.text })
     try { localStorage.setItem('aiprint_cart', JSON.stringify(cart)) } catch (e) {}
     setAdded(true)
   }
@@ -117,95 +147,82 @@ export default function CustomizePage() {
         </div>
       </nav>
 
-      <section className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-6">Product Customizer</h1>
+      <section className="max-w-3xl mx-auto px-4 py-6">
+        <h1 className="text-2xl font-bold text-center mb-4">Product Customizer</h1>
 
-        <div className="bg-white rounded-2xl shadow-lg p-4 mb-6">
-          <svg viewBox="0 0 300 300" className="w-full">
-            <defs>
-              <clipPath id="printClip">
-                <rect x={pa.x} y={pa.y} width={pa.w} height={pa.h} />
-              </clipPath>
-            </defs>
-            <ProductBase type={product.type} color={colorHex} />
-            <rect x={pa.x} y={pa.y} width={pa.w} height={pa.h} fill="none" stroke="#00000030" strokeDasharray="4 3" />
-            <g clipPath="url(#printClip)">
-              {designUrl && <image href={designUrl} x={dx} y={dy} width={dw} height={dw} preserveAspectRatio="xMidYMid slice" />}
-              {text && <text x={pa.x + pa.w / 2} y={pa.y + pa.h - 6} textAnchor="middle" fontSize={textSize} fill={textColor} fontWeight="bold">{text}</text>}
-            </g>
-          </svg>
+        {product.apparel && (
+          <div className="flex gap-2 justify-center mb-4">
+            <button onClick={() => setBack(false)} className={`px-6 py-2 rounded-full text-sm font-semibold ${!back ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>Front print</button>
+            <button onClick={() => setBack(true)} className={`px-6 py-2 rounded-full text-sm font-semibold ${back ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>Back print</button>
+          </div>
+        )}
+
+        <div className="relative bg-white rounded-2xl shadow-lg aspect-square mb-4 overflow-hidden" onPointerMove={onMove} onPointerUp={endDrag}>
+          <Mock type={product.type} back={back} color={colorHex} />
+          <div ref={printRef} className="absolute border-2 border-dashed border-cyan-400 overflow-hidden" style={{ left: area.l + '%', top: area.t + '%', width: area.w + '%', height: area.h + '%' }}>
+            {layer.url && (
+              <div className="absolute touch-none cursor-move select-none" style={{ left: layer.x + '%', top: layer.y + '%', width: layer.w + '%' }} onPointerDown={(e) => startDrag(e, 'design')}>
+                <img src={layer.url} alt="design" className="w-full pointer-events-none" draggable={false} />
+                {selected === 'design' && (
+                  <>
+                    <button onPointerDown={(e) => e.stopPropagation()} onClick={() => setLayer({ url: null })} className="absolute -top-3 -right-3 w-7 h-7 bg-red-500 text-white rounded-full text-sm font-bold">✕</button>
+                    <div onPointerDown={startResize} className="absolute -bottom-2 -right-2 w-5 h-5 bg-cyan-400 rounded-full touch-none"></div>
+                  </>
+                )}
+              </div>
+            )}
+            {layer.text && (
+              <div className="absolute touch-none cursor-move select-none whitespace-nowrap font-bold" style={{ left: layer.tx + '%', top: layer.ty + '%', color: layer.textColor, fontSize: layer.textSize, fontFamily: layer.font }} onPointerDown={(e) => startDrag(e, 'text')}>
+                {layer.text}
+                {selected === 'text' && <button onPointerDown={(e) => e.stopPropagation()} onClick={() => setLayer({ text: '' })} className="absolute -top-3 -right-3 w-6 h-6 bg-red-500 text-white rounded-full text-xs font-bold">✕</button>}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 space-y-5">
-          <div>
-            <p className="font-bold mb-2">Product</p>
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {products.map((p) => (
-                <button key={p.id} onClick={() => setProductId(p.id)} className={`shrink-0 px-4 py-2 rounded-full text-sm font-semibold ${productId === p.id ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'}`}>{p.name}</button>
-              ))}
-            </div>
+        <div className="bg-white rounded-2xl shadow-lg p-5 space-y-4">
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {products.map((p) => (
+              <button key={p.id} onClick={() => setProductId(p.id)} className={`shrink-0 px-4 py-2 rounded-full text-sm font-semibold ${productId === p.id ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'}`}>{p.name}</button>
+            ))}
           </div>
 
-          <div>
-            <p className="font-bold mb-2">Product Color</p>
-            <div className="flex gap-2 flex-wrap">
-              {colors.map((c) => (
-                <button key={c.name} onClick={() => setColorHex(c.hex)} className={`w-9 h-9 rounded-full border-2 ${colorHex === c.hex ? 'border-purple-600 scale-110' : 'border-gray-300'}`} style={{ backgroundColor: c.hex }} title={c.name}></button>
-              ))}
-            </div>
-          </div>
-
-          {product.sizes && (
-            <div>
-              <p className="font-bold mb-2">Size</p>
-              <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap items-center">
+            {colors.map((c) => (
+              <button key={c.name} onClick={() => setColorHex(c.hex)} className={`w-9 h-9 rounded-full border-2 ${colorHex === c.hex ? 'border-purple-600 scale-110' : 'border-gray-300'}`} style={{ backgroundColor: c.hex }}></button>
+            ))}
+            {product.apparel && (
+              <div className="flex gap-1 ml-auto">
                 {sizes.map((s) => (
-                  <button key={s} onClick={() => setSize(s)} className={`px-4 py-2 rounded-lg text-sm font-semibold ${size === s ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'}`}>{s}</button>
+                  <button key={s} onClick={() => setSize(s)} className={`px-3 py-1 rounded-lg text-xs font-semibold ${size === s ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'}`}>{s}</button>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
-          <div>
-            <p className="font-bold mb-2">Design</p>
-            <div className="space-y-3">
-              <label className="flex items-center gap-2 text-sm font-semibold text-purple-600 cursor-pointer">
-                <span className="bg-purple-50 px-3 py-2 rounded-lg">📤 Upload design</span>
-                <input type="file" accept="image/*" className="hidden" onChange={onUpload} />
-              </label>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Size: {Math.round(scale * 100)}%</p>
-                <input type="range" min="0.2" max="1" step="0.05" value={scale} onChange={(e) => setScale(Number(e.target.value))} className="w-full accent-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Move left / right</p>
-                <input type="range" min="-50" max="50" value={posX} onChange={(e) => setPosX(Number(e.target.value))} className="w-full accent-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Move up / down</p>
-                <input type="range" min="-50" max="50" value={posY} onChange={(e) => setPosY(Number(e.target.value))} className="w-full accent-purple-600" />
-              </div>
-              <button onClick={() => setDesignUrl(null)} className="text-red-500 text-sm font-semibold">🗑️ Remove design</button>
-            </div>
+          <div className="flex gap-2 flex-wrap">
+            <label className="bg-purple-50 text-purple-600 px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer">📤 Upload design
+              <input type="file" accept="image/*" className="hidden" onChange={onUpload} />
+            </label>
           </div>
 
           <div>
-            <p className="font-bold mb-2">Add Text</p>
-            <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Your text here..." className="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-purple-500 outline-none" />
-            <div className="flex gap-2 mt-2 flex-wrap">
-              {['#1f2937', '#ffffff', '#dc2626', '#2563eb', '#facc15', '#ec4899'].map((c) => (
-                <button key={c} onClick={() => setTextColor(c)} className={`w-8 h-8 rounded-full border-2 ${textColor === c ? 'border-purple-600 scale-110' : 'border-gray-300'}`} style={{ backgroundColor: c }}></button>
+            <p className="font-bold mb-1">Add Text</p>
+            <input value={layer.text} onChange={(e) => setLayer({ text: e.target.value })} placeholder="Type your text..." className="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-purple-500 outline-none" />
+            <div className="flex gap-2 mt-2 flex-wrap items-center">
+              <select value={layer.font} onChange={(e) => setLayer({ font: e.target.value })} className="border-2 border-gray-200 rounded-lg p-2 text-sm">
+                {fonts.map((f) => <option key={f} value={f}>{f}</option>)}
+              </select>
+              <input type="range" min="10" max="32" value={layer.textSize} onChange={(e) => setLayer({ textSize: Number(e.target.value) })} className="flex-1 accent-purple-600" />
+              {['#ffffff', '#111111', '#dc2626', '#facc15', '#2563eb'].map((c) => (
+                <button key={c} onClick={() => setLayer({ textColor: c })} className={`w-7 h-7 rounded-full border-2 ${layer.textColor === c ? 'border-purple-600' : 'border-gray-300'}`} style={{ backgroundColor: c }}></button>
               ))}
-            </div>
-            <div className="mt-2">
-              <p className="text-sm text-gray-600 mb-1">Text size: {textSize}</p>
-              <input type="range" min="8" max="28" value={textSize} onChange={(e) => setTextSize(Number(e.target.value))} className="w-full accent-purple-600" />
             </div>
           </div>
 
           <div className="border-t pt-4 flex items-center justify-between">
             <div>
-              <p className="font-bold">{product.name}</p>
+              <p className="font-bold">{product.name} {product.apparel ? '- ' + size : ''}</p>
               <p className="text-purple-600 font-bold">${product.price}</p>
             </div>
             <button onClick={addToCart} className="bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700">{added ? '✓ Added' : '🛒 Add to Cart'}</button>
@@ -214,4 +231,4 @@ export default function CustomizePage() {
       </section>
     </div>
   )
-    }
+}
