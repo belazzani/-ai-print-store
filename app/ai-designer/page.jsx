@@ -22,19 +22,19 @@ export default function AIDesignerPage() {
   const [designs, setDesigns] = useState(null)
   const [selected, setSelected] = useState(null)
   const [added, setAdded] = useState(false)
-  const [loadingImgs, setLoadingImgs] = useState(0)
 
   const generate = () => {
     if (!prompt.trim()) return
     const base = encodeURIComponent(prompt + ', high quality print design')
+    const keywords = prompt.split(' ').filter((w) => w.length > 3).slice(0, 3).join(',') || 'art'
     setDesigns(
       [0, 1, 2, 3].map((i) => ({
         id: i,
         gradient: gradients[i],
-        url: 'https://image.pollinations.ai/prompt/' + base + '?seed=' + (Date.now() % 100000 + i) + '&width=512&height=512&nologo=true',
+        url: 'https://image.pollinations.ai/prompt/' + base + '?seed=' + (Date.now() % 100000 + i) + '&width=512&height=512',
+        fallback: 'https://loremflickr.com/512/512/' + keywords + '?lock=' + (i + 1),
       }))
     )
-    setLoadingImgs(4)
     setSelected(null)
     setAdded(false)
   }
@@ -83,24 +83,26 @@ export default function AIDesignerPage() {
         {designs && (
           <div>
             <h2 className="text-2xl font-bold mb-2 text-center">Your AI Designs</h2>
-            <p className="text-center text-sm text-gray-500 mb-6">
-              {loadingImgs > 0 ? 'AI is drawing... wait up to 30 seconds' : 'Tap a design to select it'}
-            </p>
+            <p className="text-center text-sm text-gray-500 mb-6">Images may take up to 30 seconds - tap one to select</p>
             <div className="grid grid-cols-2 gap-4 mb-8">
               {designs.map((d) => (
                 <button
                   key={d.id}
                   onClick={() => { setSelected(d.id); setAdded(false) }}
-                  className={`bg-gradient-to-br ${d.gradient} aspect-square rounded-2xl overflow-hidden relative transition ${
+                  className={`bg-gradient-to-br ${d.gradient} aspect-square rounded-2xl overflow-hidden relative transition flex items-center justify-center ${
                     selected === d.id ? 'ring-4 ring-purple-600 scale-95' : 'hover:scale-105'
                   }`}
                 >
+                  <span className="absolute text-4xl animate-pulse">⏳</span>
                   <img
                     src={d.url}
                     alt="AI design"
-                    onLoad={() => setLoadingImgs((n) => n - 1)}
-                    onError={() => setLoadingImgs((n) => n - 1)}
-                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      if (e.currentTarget.src !== d.fallback) {
+                        e.currentTarget.src = d.fallback
+                      }
+                    }}
+                    className="relative w-full h-full object-cover"
                   />
                 </button>
               ))}
