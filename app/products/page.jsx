@@ -4,7 +4,7 @@ const IMG = 'https://raw.githubusercontent.com/belazzani/-ai-print-store/main/'
 
 const products = [
   { id: 1, name: 'Classic T-Shirt', img: 'tshirt-white.png', price: 24.99, badge: 'Best Seller' },
-  { id: 2, name: 'Black T-Shirt', img: 'tshirt-black.png', price: 24.99, badge: 'Best Seller' },
+  { id: 2, name: 'Black T-Shirt', img: 'tshirt-black2.png', price: 24.99, badge: 'Best Seller' },
   { id: 3, name: 'Navy T-Shirt', img: 'tshirt-navy.png', price: 24.99, badge: null },
   { id: 4, name: 'Hoodie', img: 'hoodie-gray.png', price: 44.99, badge: 'Best Seller' },
   { id: 5, name: 'Sweatshirt', img: 'sweatshirt-dark.png', price: 39.99, badge: null },
