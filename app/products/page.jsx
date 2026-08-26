@@ -1,26 +1,30 @@
 import Link from 'next/link'
 
+const IMG = 'https://raw.githubusercontent.com/belazzani/-ai-print-store/main/'
+
 const products = [
-  { id: 1, name: 'Classic T-Shirt', emoji: '👕', price: 24.99, badge: 'Best Seller', gradient: 'from-purple-200 to-pink-200' },
-  { id: 2, name: 'Ceramic Mug 11oz', emoji: '☕', price: 14.99, badge: 'Best Seller', gradient: 'from-orange-200 to-yellow-200' },
-  { id: 3, name: 'Mobile Cover (Phone Case)', emoji: '📱', price: 19.99, badge: 'Best Seller', gradient: 'from-blue-200 to-cyan-200' },
-  { id: 4, name: 'Poster', emoji: '🖼️', price: 12.99, badge: null, gradient: 'from-green-200 to-teal-200' },
-  { id: 5, name: 'Hoodie', emoji: '🧥', price: 44.99, badge: 'Best Seller', gradient: 'from-gray-200 to-slate-300' },
-  { id: 6, name: 'Tote Bag', emoji: '👜', price: 19.99, badge: null, gradient: 'from-amber-200 to-orange-200' },
-  { id: 7, name: 'Large Mug 15oz', emoji: '🍵', price: 17.99, badge: null, gradient: 'from-red-200 to-pink-200' },
-  { id: 8, name: 'Stickers Pack', emoji: '✨', price: 4.99, badge: null, gradient: 'from-fuchsia-200 to-purple-200' },
-  { id: 9, name: 'Throw Pillow', emoji: '🛋️', price: 24.99, badge: null, gradient: 'from-indigo-200 to-blue-200' },
-  { id: 10, name: 'Canvas Print', emoji: '🎨', price: 34.99, badge: null, gradient: 'from-rose-200 to-red-200' },
-  { id: 11, name: 'Sweatshirt', emoji: '👚', price: 39.99, badge: null, gradient: 'from-lime-200 to-green-200' },
-  { id: 12, name: 'Tank Top', emoji: '🎽', price: 19.99, badge: null, gradient: 'from-cyan-200 to-teal-200' },
-  { id: 13, name: 'Long Sleeve Tee', emoji: '👕', price: 27.99, badge: null, gradient: 'from-violet-200 to-purple-200' },
-  { id: 14, name: 'Baby Onesie', emoji: '👶', price: 16.99, badge: null, gradient: 'from-pink-200 to-rose-200' },
-  { id: 15, name: 'Kids Tee', emoji: '🧒', price: 18.99, badge: null, gradient: 'from-yellow-200 to-amber-200' },
-  { id: 16, name: 'Cap & Beanie', emoji: '🧢', price: 22.99, badge: null, gradient: 'from-slate-200 to-gray-300' },
-  { id: 17, name: 'Socks', emoji: '🧦', price: 12.99, badge: null, gradient: 'from-teal-200 to-emerald-200' },
-  { id: 18, name: 'Backpack', emoji: '🎒', price: 39.99, badge: null, gradient: 'from-blue-200 to-indigo-200' },
-  { id: 19, name: 'Blanket', emoji: '🧶', price: 49.99, badge: null, gradient: 'from-orange-200 to-red-200' },
-  { id: 20, name: 'Towel', emoji: '🏖️', price: 29.99, badge: null, gradient: 'from-sky-200 to-blue-200' },
+  { id: 1, name: 'Classic T-Shirt', img: 'tshirt-white.png', price: 24.99, badge: 'Best Seller' },
+  { id: 2, name: 'Black T-Shirt', img: '1787774395.png', price: 24.99, badge: 'Best Seller' },
+  { id: 3, name: 'Navy T-Shirt', img: 'tshirt-navy.png', price: 24.99, badge: null },
+  { id: 4, name: 'Hoodie', img: 'hoodie-gray.png', price: 44.99, badge: 'Best Seller' },
+  { id: 5, name: 'Sweatshirt', img: 'sweatshirt-dark.png', price: 39.99, badge: null },
+  { id: 6, name: 'Tank Top', img: 'tank-white.png', price: 19.99, badge: null },
+  { id: 7, name: 'Long Sleeve Tee', img: 'longsleeve-white.png', price: 27.99, badge: null },
+  { id: 8, name: 'Kids Tee', img: 'kids-tee.png', price: 18.99, badge: null },
+  { id: 9, name: 'Baby Onesie', img: 'baby-onesie.png', price: 16.99, badge: null },
+  { id: 10, name: 'Ceramic Mug 11oz', img: 'mug-15.png', price: 14.99, badge: 'Best Seller' },
+  { id: 11, name: 'Large Mug 15oz', img: 'mug-15.png', price: 17.99, badge: null },
+  { id: 12, name: 'Mobile Cover', img: 'phone-case.png', price: 19.99, badge: 'Best Seller' },
+  { id: 13, name: 'Tote Bag', img: 'tote.png', price: 19.99, badge: null },
+  { id: 14, name: 'Poster', img: 'poster.png', price: 12.99, badge: null },
+  { id: 15, name: 'Canvas Print', img: 'canvas.png', price: 34.99, badge: null },
+  { id: 16, name: 'Throw Pillow', img: 'pillow.png', price: 24.99, badge: null },
+  { id: 17, name: 'Blanket', img: 'blanket.png', price: 49.99, badge: null },
+  { id: 18, name: 'Towel', img: 'towel.png', price: 29.99, badge: null },
+  { id: 19, name: 'Stickers Pack', img: 'stickers.png', price: 4.99, badge: null },
+  { id: 20, name: 'Cap', img: 'cap.png', price: 22.99, badge: null },
+  { id: 21, name: 'Beanie', img: 'beanie.png', price: 20.99, badge: null },
+  { id: 22, name: 'Socks', img: 'socks.png', price: 12.99, badge: null },
 ]
 
 export default function ProductsPage() {
@@ -41,19 +45,15 @@ export default function ProductsPage() {
           {products.map((p) => (
             <div key={p.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition relative">
               {p.badge && (
-                <span className="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full z-10">
-                  🔥 {p.badge}
-                </span>
+                <span className="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full z-10">🔥 {p.badge}</span>
               )}
-              <div className={`bg-gradient-to-br ${p.gradient} aspect-square flex items-center justify-center`}>
-                <span className="text-7xl">{p.emoji}</span>
+              <div className="aspect-square bg-gray-100">
+                <img src={IMG + p.img} alt={p.name} className="w-full h-full object-cover" />
               </div>
               <div className="p-4">
                 <h3 className="font-semibold mb-1">{p.name}</h3>
                 <p className="text-purple-600 font-bold mb-3">${p.price}</p>
-                <Link href="/ai-designer" className="block text-center bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 text-sm font-semibold">
-                  Customize with AI
-                </Link>
+                <Link href="/customize" className="block text-center bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 text-sm font-semibold">Customize</Link>
               </div>
             </div>
           ))}
@@ -61,4 +61,4 @@ export default function ProductsPage() {
       </section>
     </div>
   )
-   }
+}
