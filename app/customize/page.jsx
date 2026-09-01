@@ -6,28 +6,28 @@ import Link from 'next/link'
 const IMG = 'https://raw.githubusercontent.com/belazzani/-ai-print-store/main/'
 
 const products = [
-  { id: 'tshirt-white', name: 'White Tee', img: 'tshirt-white.png', price: 24.99, apparel: true, area: { l: 39, t: 30, w: 22, h: 34 } },
-  { id: 'tshirt-black', name: 'Black Tee', img: 'tshirt-black2.png', price: 24.99, apparel: true, area: { l: 39, t: 30, w: 22, h: 34 } },
-  { id: 'tshirt-navy', name: 'Navy Tee', img: 'tshirt-navy.png', price: 24.99, apparel: true, area: { l: 39, t: 30, w: 22, h: 34 } },
-  { id: 'hoodie', name: 'Hoodie', img: 'hoodie-gray.png', price: 44.99, apparel: true, area: { l: 38, t: 35, w: 24, h: 28 } },
-  { id: 'sweatshirt', name: 'Sweatshirt', img: 'sweatshirt-dark.png', price: 39.99, apparel: true, area: { l: 37, t: 32, w: 26, h: 32 } },
-  { id: 'tank', name: 'Tank Top', img: 'tank-white.png', price: 19.99, apparel: true, area: { l: 40, t: 30, w: 20, h: 35 } },
-  { id: 'longsleeve', name: 'Long Sleeve', img: 'longsleeve-white.png', price: 27.99, apparel: true, area: { l: 39, t: 28, w: 22, h: 35 } },
-  { id: 'kids', name: 'Kids Tee', img: 'kids-tee.png', price: 18.99, apparel: true, area: { l: 38, t: 35, w: 24, h: 30 } },
-  { id: 'onesie', name: 'Baby Onesie', img: 'baby-onesie.png', price: 16.99, apparel: true, area: { l: 40, t: 30, w: 20, h: 25 } },
-  { id: 'mug11', name: 'Mug 11oz', img: 'mug-15.png', price: 14.99, apparel: false, area: { l: 36, t: 30, w: 26, h: 40 } },
-  { id: 'mug15', name: 'Mug 15oz', img: 'mug-15.png', price: 17.99, apparel: false, area: { l: 36, t: 30, w: 26, h: 40 } },
-  { id: 'phone', name: 'Mobile Cover', img: 'phone-case.png', price: 19.99, apparel: false, area: { l: 40, t: 28, w: 20, h: 58 } },
-  { id: 'tote', name: 'Tote Bag', img: 'tote.png', price: 19.99, apparel: false, area: { l: 36, t: 40, w: 28, h: 35 } },
-  { id: 'poster', name: 'Poster', img: 'poster.png', price: 12.99, apparel: false, area: { l: 40, t: 18, w: 24, h: 60 } },
+  { id: 'tshirt-white', name: 'White Tee', img: 'tshirt-white.png', price: 24.99, apparel: true, area: { l: 38, t: 28, w: 24, h: 36 } },
+  { id: 'tshirt-black', name: 'Black Tee', img: 'tshirt-black2.png', price: 24.99, apparel: true, area: { l: 38, t: 28, w: 24, h: 36 } },
+  { id: 'tshirt-navy', name: 'Navy Tee', img: 'tshirt-navy.png', price: 24.99, apparel: true, area: { l: 38, t: 28, w: 24, h: 36 } },
+  { id: 'hoodie', name: 'Hoodie', img: 'hoodie-gray.png', price: 44.99, apparel: true, area: { l: 37, t: 32, w: 26, h: 30 } },
+  { id: 'sweatshirt', name: 'Sweatshirt', img: 'sweatshirt-dark.png', price: 39.99, apparel: true, area: { l: 36, t: 30, w: 28, h: 34 } },
+  { id: 'tank', name: 'Tank Top', img: 'tank-white.png', price: 19.99, apparel: true, area: { l: 40, t: 28, w: 20, h: 36 } },
+  { id: 'longsleeve', name: 'Long Sleeve', img: 'longsleeve-white.png', price: 27.99, apparel: true, area: { l: 39, t: 26, w: 22, h: 36 } },
+  { id: 'kids', name: 'Kids Tee', img: 'kids-tee.png', price: 18.99, apparel: true, area: { l: 37, t: 32, w: 26, h: 32 } },
+  { id: 'onesie', name: 'Baby Onesie', img: 'baby-onesie.png', price: 16.99, apparel: true, area: { l: 40, t: 25, w: 20, h: 28 } },
+  { id: 'mug11', name: 'Mug 11oz', img: 'mug-15.png', price: 14.99, apparel: false, area: { l: 35, t: 28, w: 28, h: 45 } },
+  { id: 'mug15', name: 'Mug 15oz', img: 'mug-15.png', price: 17.99, apparel: false, area: { l: 35, t: 28, w: 28, h: 45 } },
+  { id: 'phone', name: 'Mobile Cover', img: 'phone-case.png', price: 19.99, apparel: false, area: { l: 40, t: 28, w: 20, h: 60 } },
+  { id: 'tote', name: 'Tote Bag', img: 'tote.png', price: 19.99, apparel: false, area: { l: 35, t: 38, w: 30, h: 40 } },
+  { id: 'poster', name: 'Poster', img: 'poster.png', price: 12.99, apparel: false, area: { l: 40, t: 16, w: 24, h: 66 } },
   { id: 'canvas', name: 'Canvas', img: 'canvas.png', price: 34.99, apparel: false, area: { l: 36, t: 20, w: 30, h: 58 } },
-  { id: 'pillow', name: 'Pillow', img: 'pillow.png', price: 24.99, apparel: false, area: { l: 34, t: 25, w: 32, h: 50 } },
-  { id: 'blanket', name: 'Blanket', img: 'blanket.png', price: 49.99, apparel: false, area: { l: 30, t: 25, w: 40, h: 25 } },
-  { id: 'towel', name: 'Towel', img: 'towel.png', price: 29.99, apparel: false, area: { l: 35, t: 30, w: 30, h: 25 } },
-  { id: 'stickers', name: 'Stickers', img: 'stickers.png', price: 4.99, apparel: false, area: { l: 36, t: 25, w: 24, h: 50 } },
-  { id: 'cap', name: 'Cap', img: 'cap.png', price: 22.99, apparel: false, area: { l: 38, t: 30, w: 14, h: 12 } },
-  { id: 'beanie', name: 'Beanie', img: 'beanie.png', price: 20.99, apparel: false, area: { l: 40, t: 45, w: 15, h: 12 } },
-  { id: 'socks', name: 'Socks', img: 'socks.png', price: 12.99, apparel: false, area: { l: 35, t: 30, w: 25, h: 25 } },
+  { id: 'pillow', name: 'Pillow', img: 'pillow.png', price: 24.99, apparel: false, area: { l: 33, t: 22, w: 34, h: 55 } },
+  { id: 'blanket', name: 'Blanket', img: 'blanket.png', price: 49.99, apparel: false, area: { l: 25, t: 25, w: 50, h: 25 } },
+  { id: 'towel', name: 'Towel', img: 'towel.png', price: 29.99, apparel: false, area: { l: 30, t: 28, w: 40, h: 28 } },
+  { id: 'stickers', name: 'Stickers', img: 'stickers.png', price: 4.99, apparel: false, area: { l: 36, t: 22, w: 26, h: 55 } },
+  { id: 'cap', name: 'Cap', img: 'cap.png', price: 22.99, apparel: false, area: { l: 38, t: 28, w: 16, h: 14 } },
+  { id: 'beanie', name: 'Beanie', img: 'beanie.png', price: 20.99, apparel: false, area: { l: 40, t: 44, w: 18, h: 14 } },
+  { id: 'socks', name: 'Socks', img: 'socks.png', price: 12.99, apparel: false, area: { l: 35, t: 25, w: 30, h: 35 } },
 ]
 
 const sizes = ['S', 'M', 'L', 'XL', '2XL']
@@ -40,6 +40,17 @@ export default function CustomizePage() {
   const [layers, setLayers] = useState({})
   const [selected, setSelected] = useState('design')
   const [added, setAdded] = useState(false)
+  const [calibrate, setCalibrate] = useState(false)
+  const [areas, setAreas] = useState(() => {
+    const base = {}
+    try {
+      const saved = JSON.parse(localStorage.getItem('aiprint_areas') || '{}')
+      products.forEach((p) => { base[p.id] = saved[p.id] || p.area })
+    } catch (e) {
+      products.forEach((p) => { base[p.id] = p.area })
+    }
+    return base
+  })
 
   const printRef = useRef(null)
   const drag = useRef(null)
@@ -54,10 +65,18 @@ export default function CustomizePage() {
   }, [])
 
   const product = products.find((p) => p.id === productId)
-  const area = product.area
+  const area = areas[productId] || product.area
   const layer = layers[productId] || emptyLayer
 
   const setLayer = (patch) => setLayers((prev) => ({ ...prev, [productId]: { ...(prev[productId] || emptyLayer), ...patch } }))
+
+  const setArea = (key, value) => {
+    setAreas((prev) => {
+      const next = { ...prev, [productId]: { ...prev[productId], [key]: value } }
+      try { localStorage.setItem('aiprint_areas', JSON.stringify(next)) } catch (e) {}
+      return next
+    })
+  }
 
   const startDrag = (e, kind) => {
     e.stopPropagation()
@@ -147,6 +166,18 @@ export default function CustomizePage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-5 space-y-4">
+          <button onClick={() => setCalibrate(!calibrate)} className={`w-full py-2 rounded-lg text-sm font-semibold ${calibrate ? 'bg-cyan-500 text-white' : 'bg-gray-100 text-gray-600'}`}>⚙️ {calibrate ? 'Calibration Mode: ON' : 'Calibrate Print Area'}</button>
+
+          {calibrate && (
+            <div className="bg-cyan-50 rounded-xl p-4 space-y-2">
+              <p className="text-xs text-cyan-700 font-semibold mb-1">حرّك المنزلقات حتى يطابق الإطار المتقطع سطح الطباعة — يُحفظ تلقائياً 💾</p>
+              <div><p className="text-xs text-gray-600">Left: {area.l}</p><input type="range" min="0" max="80" value={area.l} onChange={(e) => setArea('l', Number(e.target.value))} className="w-full accent-cyan-500" /></div>
+              <div><p className="text-xs text-gray-600">Top: {area.t}</p><input type="range" min="0" max="80" value={area.t} onChange={(e) => setArea('t', Number(e.target.value))} className="w-full accent-cyan-500" /></div>
+              <div><p className="text-xs text-gray-600">Width: {area.w}</p><input type="range" min="5" max="80" value={area.w} onChange={(e) => setArea('w', Number(e.target.value))} className="w-full accent-cyan-500" /></div>
+              <div><p className="text-xs text-gray-600">Height: {area.h}</p><input type="range" min="5" max="80" value={area.h} onChange={(e) => setArea('h', Number(e.target.value))} className="w-full accent-cyan-500" /></div>
+            </div>
+          )}
+
           {product.apparel && (
             <div className="flex gap-2">
               {sizes.map((s) => (
