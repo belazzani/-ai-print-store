@@ -1,15 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 
+const IMG = 'https://raw.githubusercontent.com/belazzani/-ai-print-store/main/'
+
 const products = [
-  { id: 'tshirt', name: 'Classic T-Shirt', emoji: '👕', price: 24.99 },
-  { id: 'hoodie', name: 'Hoodie', emoji: '🧥', price: 44.99 },
-  { id: 'mug', name: 'Ceramic Mug', emoji: '☕', price: 14.99 },
-  { id: 'phone', name: 'Mobile Cover', emoji: '📱', price: 19.99 },
-  { id: 'poster', name: 'Poster', emoji: '🖼️', price: 12.99 },
-  { id: 'tote', name: 'Tote Bag', emoji: '👜', price: 19.99 },
+  { id: 'tshirt-black', name: 'Black Tee', img: 'tshirt-black2.png', area: { l: 38, t: 28, w: 24, h: 36 } },
+  { id: 'tshirt-white', name: 'White Tee', img: 'tshirt-white.png', area: { l: 38, t: 28, w: 24, h: 36 } },
+  { id: 'hoodie', name: 'Hoodie', img: 'hoodie-gray.png', area: { l: 37, t: 32, w: 26, h: 30 } },
+  { id: 'mug15', name: 'Mug', img: 'mug-15.png', area: { l: 35, t: 28, w: 28, h: 45 } },
+  { id: 'phone', name: 'Mobile Cover', img: 'phone-case.png', area: { l: 40, t: 28, w: 20, h: 60 } },
+  { id: 'tote', name: 'Tote Bag', img: 'tote.png', area: { l: 35, t: 38, w: 30, h: 40 } },
+  { id: 'poster', name: 'Poster', img: 'poster.png', area: { l: 40, t: 16, w: 24, h: 66 } },
+  { id: 'pillow', name: 'Pillow', img: 'pillow.png', area: { l: 33, t: 22, w: 34, h: 55 } },
 ]
 
 const examplePrompts = [
@@ -26,34 +30,18 @@ const gradients = [
   'from-orange-400 via-amber-400 to-yellow-400',
 ]
 
-export default function DesignStudio() {
+export default function StudioPage() {
   const [tab, setTab] = useState('ai')
   const [prompt, setPrompt] = useState('')
   const [designs, setDesigns] = useState([])
   const [designUrl, setDesignUrl] = useState(null)
-  const [productId, setProductId] = useState('tshirt')
-  const [added, setAdded] = useState(false)
-  const [cartCount, setCartCount] = useState(0)
+  const [previewId, setPreviewId] = useState('tshirt-black')
 
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('aiprint_design') || 'null')
-      if (saved) {
-        setDesignUrl(saved.designUrl)
-        setProductId(saved.productId || 'tshirt')
-        setPrompt(saved.prompt || '')
-      }
-      const cart = JSON.parse(localStorage.getItem('aiprint_cart') || '[]')
-      setCartCount(cart.length)
-    } catch (e) {}
-  }, [])
+  const preview = products.find((p) => p.id === previewId)
 
-  const saveDesign = (url, pid, pr) => {
+  const selectDesign = (url) => {
     setDesignUrl(url)
-    setAdded(false)
-    try {
-      localStorage.setItem('aiprint_design', JSON.stringify({ designUrl: url, productId: pid, prompt: pr }))
-    } catch (e) {}
+    try { localStorage.setItem('aiprint_design', JSON.stringify({ designUrl: url })) } catch (e) {}
   }
 
   const generate = () => {
@@ -74,38 +62,21 @@ export default function DesignStudio() {
     const file = e.target.files[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = () => saveDesign(reader.result, productId, prompt)
+    reader.onload = () => selectDesign(reader.result)
     reader.readAsDataURL(file)
   }
-
-  const addToCart = () => {
-    const item = products.find((p) => p.id === productId)
-    let cart = []
-    try { cart = JSON.parse(localStorage.getItem('aiprint_cart') || '[]') } catch (e) {}
-    cart.push({ id: item.id, name: item.name, price: item.price, designUrl: designUrl })
-    try { localStorage.setItem('aiprint_cart', JSON.stringify(cart)) } catch (e) {}
-    setCartCount(cart.length)
-    setAdded(true)
-  }
-
-  const product = products.find((p) => p.id === productId)
 
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold text-purple-600">AI-Print</Link>
-          <div className="flex items-center gap-4">
-            <Link href="/products" className="text-purple-600 font-semibold text-sm">Browse Products</Link>
-            <span className="relative text-2xl">🛒
-              <span className="absolute -top-2 -right-3 bg-purple-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">{cartCount}</span>
-            </span>
-          </div>
+          <Link href="/products" className="text-purple-600 font-semibold text-sm">Browse Products</Link>
         </div>
       </nav>
 
       <section className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-6">Design Studio</h1>
+        <h1 className="text-3xl font-bold text-center mb-6">AI Design Studio</h1>
 
         <div className="flex gap-2 mb-6">
           <button onClick={() => setTab('ai')} className={`flex-1 py-3 rounded-xl font-semibold ${tab === 'ai' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>✨ AI Generate</button>
@@ -124,17 +95,6 @@ export default function DesignStudio() {
           </div>
         )}
 
-        {tab === 'ai' && designs.length > 0 && (
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            {designs.map((d) => (
-              <button key={d.id} onClick={() => saveDesign(d.url, productId, prompt)} className={`bg-gradient-to-br ${d.gradient} aspect-square rounded-xl overflow-hidden relative flex items-center justify-center ${designUrl === d.url ? 'ring-4 ring-purple-600' : ''}`}>
-                <span className="absolute text-3xl animate-pulse">⏳</span>
-                <img src={d.url} alt="AI design" onError={(e) => { if (e.currentTarget.src !== d.fallback) e.currentTarget.src = d.fallback }} className="relative w-full h-full object-cover" />
-              </button>
-            ))}
-          </div>
-        )}
-
         {tab === 'upload' && (
           <label className="block cursor-pointer border-2 border-dashed border-purple-300 bg-white rounded-2xl p-8 text-center mb-6 hover:bg-purple-50">
             <span className="text-5xl block mb-2">📤</span>
@@ -144,26 +104,33 @@ export default function DesignStudio() {
           </label>
         )}
 
+        {tab === 'ai' && designs.length > 0 && (
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            {designs.map((d) => (
+              <button key={d.id} onClick={() => selectDesign(d.url)} className={`bg-gradient-to-br ${d.gradient} aspect-square rounded-xl overflow-hidden relative flex items-center justify-center ${designUrl === d.url ? 'ring-4 ring-purple-600' : ''}`}>
+                <span className="absolute text-3xl animate-pulse">⏳</span>
+                <img src={d.url} alt="AI design" onError={(e) => { if (e.currentTarget.src !== d.fallback) e.currentTarget.src = d.fallback }} className="relative w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
+
         {designUrl && (
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-bold mb-4">Your Product Preview</h2>
-            <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
+          <div className="bg-white rounded-2xl shadow-lg p-5">
+            <h2 className="text-xl font-bold mb-3">ضعه على منتج</h2>
+            <div className="flex gap-2 overflow-x-auto pb-2 mb-3">
               {products.map((p) => (
-                <button key={p.id} onClick={() => { setProductId(p.id); saveDesign(designUrl, p.id, prompt) }} className={`shrink-0 px-4 py-2 rounded-full text-sm font-semibold ${productId === p.id ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'}`}>{p.emoji} {p.name}</button>
+                <button key={p.id} onClick={() => setPreviewId(p.id)} className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold ${previewId === p.id ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                  <img src={IMG + p.img} alt={p.name} className="w-7 h-7 rounded-full object-cover" />
+                  {p.name}
+                </button>
               ))}
             </div>
-            <div className="relative bg-gray-100 rounded-2xl aspect-square flex items-center justify-center overflow-hidden mb-4">
-              <span className="text-[120px] opacity-40">{product.emoji}</span>
-              <img src={designUrl} alt="Your design on product" className="absolute w-1/2 h-1/2 object-cover rounded-lg shadow-lg" />
+            <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 mb-4">
+              <img src={IMG + preview.img} alt={preview.name} className="absolute inset-0 w-full h-full object-cover" />
+              <img src={designUrl} alt="preview" className="absolute" style={{ left: preview.area.l + preview.area.w * 0.15 + '%', top: preview.area.t + preview.area.h * 0.15 + '%', width: preview.area.w * 0.7 + '%' }} />
             </div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="font-bold">{product.name}</p>
-                <p className="text-purple-600 font-bold">${product.price}</p>
-              </div>
-              <p className="text-xs text-green-600 font-semibold">✅ Saved - survives refresh</p>
-            </div>
-            <button onClick={addToCart} className="w-full bg-green-600 text-white py-4 rounded-xl text-lg font-semibold hover:bg-green-700">{added ? '✓ Added to Cart' : '🛒 Add to Cart'}</button>
+            <Link href="/customize" className="block text-center bg-purple-600 text-white py-4 rounded-xl text-lg font-semibold hover:bg-purple-700">🎨 فتح المحرر للتحكم الكامل</Link>
           </div>
         )}
       </section>
