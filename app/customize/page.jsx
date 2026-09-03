@@ -41,6 +41,7 @@ export default function CustomizePage() {
   const [selected, setSelected] = useState('design')
   const [added, setAdded] = useState(false)
   const [calibrate, setCalibrate] = useState(false)
+  const [dragging, setDragging] = useState(false)
   const [areas, setAreas] = useState(() => {
     const base = {}
     try {
@@ -54,6 +55,8 @@ export default function CustomizePage() {
 
   const printRef = useRef(null)
   const drag = useRef(null)
+  const pointers = useRef(new Map())
+  const pinch = useRef(null)
 
   useEffect(() => {
     try {
@@ -78,12 +81,33 @@ export default function CustomizePage() {
     })
   }
 
+  const switchProduct = (id) => {
+    setLayers((prev) => {
+      const cur = prev[productId] || emptyLayer
+      const target = prev[id]
+      if (!target || (!target.url && !target.text)) {
+        return { ...prev, [id]: { ...(target || emptyLayer), url: cur.url, text: cur.text, textColor: cur.textColor, font: cur.font, textSize: cur.textSize } }
+      }
+      return prev
+    })
+    setProductId(id)
+    setAdded(false)
+  }
+
   const startDrag = (e, kind) => {
     e.stopPropagation()
     try { e.currentTarget.setPointerCapture(e.pointerId) } catch (err) {}
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (kind === 'design' && pointers.current.size === 2) {
+      const pts = [...pointers.current.values()]
+      pinch.current = { dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y), w: layer.w }
+      drag.current = null
+      return
+    }
     const rect = printRef.current.getBoundingClientRect()
-    drag.current = { kind, sx: e.clientX, sy: e.clientY, ox: kind === 'design' ? layer.x : layer.tx, oy: kind === 'design' ? layer.y : layer.ty, rect }
+    drag.current = { kind, sx: e.clientX, sy: e.clientY, ox: kind === 'design' ? layer.x : layer.tx, oy: kind === 'design' ? layer.y : layer.ty, ow: layer.w, rect }
     setSelected(kind)
+    if (kind === 'design') setDragging(true)
   }
 
   const startResize = (e) => {
@@ -94,16 +118,38 @@ export default function CustomizePage() {
   }
 
   const onMove = (e) => {
+    if (pointers.current.has(e.pointerId)) pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (pinch.current && pointers.current.size >= 2) {
+      const pts = [...pointers.current.values()]
+      const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y)
+      if (pinch.current.dist > 0) setLayer({ w: Math.min(300, Math.max(10, (pinch.current.w * d) / pinch.current.dist)) })
+      return
+    }
     const d = drag.current
     if (!d) return
     const dx = ((e.clientX - d.sx) / d.rect.width) * 100
     const dy = ((e.clientY - d.sy) / d.rect.height) * 100
-    if (d.kind === 'design') setLayer({ x: d.ox + dx, y: d.oy + dy })
-    else if (d.kind === 'text') setLayer({ tx: d.ox + dx, ty: d.oy + dy })
-    else setLayer({ w: Math.min(100, Math.max(10, d.ow + dx * 1.5)) })
+    if (d.kind === 'design') {
+      let nx = d.ox + dx
+      let ny = d.oy + dy
+      if (Math.abs(nx + layer.w / 2 - 50) < 2) nx = 50 - layer.w / 2
+      if (Math.abs(ny + layer.w / 2 - 50) < 2) ny = 50 - layer.w / 2
+      setLayer({ x: nx, y: ny })
+    } else if (d.kind === 'text') {
+      setLayer({ tx: d.ox + dx, ty: d.oy + dy })
+    } else {
+      setLayer({ w: Math.min(300, Math.max(10, d.ow + dx * 1.5)) })
+    }
   }
 
-  const endDrag = () => { drag.current = null }
+  const endDrag = (e) => {
+    pointers.current.delete(e.pointerId)
+    if (pointers.current.size < 2) pinch.current = null
+    if (pointers.current.size === 0) {
+      drag.current = null
+      setDragging(false)
+    }
+  }
 
   const onUpload = (e) => {
     const file = e.target.files[0]
@@ -121,6 +167,12 @@ export default function CustomizePage() {
     setAdded(true)
   }
 
+  const cx = layer.x + layer.w / 2
+  const cy = layer.y + layer.w / 2
+  const showV = dragging && Math.abs(cx - 50) < 2
+  const showH = dragging && Math.abs(cy - 50) < 2
+  const outOfBounds = !!layer.url && (layer.x < 0 || layer.y < 0 || layer.x + layer.w > 100 || layer.y + layer.w > 100)
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -135,16 +187,19 @@ export default function CustomizePage() {
 
         <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
           {products.map((p) => (
-            <button key={p.id} onClick={() => setProductId(p.id)} className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold ${productId === p.id ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>
+            <button key={p.id} onClick={() => switchProduct(p.id)} className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold ${productId === p.id ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>
               <img src={IMG + p.img} alt={p.name} className="w-7 h-7 rounded-full object-cover" />
               {p.name}
             </button>
           ))}
         </div>
 
-        <div className="relative bg-white rounded-2xl shadow-lg aspect-square mb-4 overflow-hidden" onPointerMove={onMove} onPointerUp={endDrag}>
+        <div className="relative bg-white rounded-2xl shadow-lg aspect-square mb-4 overflow-hidden" onPointerMove={onMove} onPointerUp={endDrag} onPointerCancel={endDrag}>
           <img src={IMG + product.img} alt={product.name} className="absolute inset-0 w-full h-full object-cover" />
-          <div ref={printRef} className="absolute border-2 border-dashed border-cyan-400 overflow-hidden" style={{ left: area.l + '%', top: area.t + '%', width: area.w + '%', height: area.h + '%' }}>
+          {outOfBounds && <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full z-20">⚠️ جزء خارج منطقة الطباعة</div>}
+          <div ref={printRef} className="absolute border-2 border-dashed border-cyan-400" style={{ left: area.l + '%', top: area.t + '%', width: area.w + '%', height: area.h + '%' }}>
+            {showV && <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-red-500 z-10 pointer-events-none"></div>}
+            {showH && <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-red-500 z-10 pointer-events-none"></div>}
             {layer.url && (
               <div className="absolute touch-none cursor-move select-none" style={{ left: layer.x + '%', top: layer.y + '%', width: layer.w + '%' }} onPointerDown={(e) => startDrag(e, 'design')}>
                 <img src={layer.url} alt="design" className="w-full pointer-events-none" draggable={false} />
@@ -170,7 +225,7 @@ export default function CustomizePage() {
 
           {calibrate && (
             <div className="bg-cyan-50 rounded-xl p-4 space-y-2">
-              <p className="text-xs text-cyan-700 font-semibold mb-1">حرّك المنزلقات حتى يطابق الإطار المتقطع سطح الطباعة — يُحفظ تلقائياً 💾</p>
+              <p className="text-xs text-cyan-700 font-semibold">حرّك المنزلقات حتى يطابق الإطار سطح الطباعة — يُحفظ تلقائياً 💾</p>
               <div><p className="text-xs text-gray-600">Left: {area.l}</p><input type="range" min="0" max="80" value={area.l} onChange={(e) => setArea('l', Number(e.target.value))} className="w-full accent-cyan-500" /></div>
               <div><p className="text-xs text-gray-600">Top: {area.t}</p><input type="range" min="0" max="80" value={area.t} onChange={(e) => setArea('t', Number(e.target.value))} className="w-full accent-cyan-500" /></div>
               <div><p className="text-xs text-gray-600">Width: {area.w}</p><input type="range" min="5" max="80" value={area.w} onChange={(e) => setArea('w', Number(e.target.value))} className="w-full accent-cyan-500" /></div>
